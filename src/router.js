@@ -21,5 +21,20 @@ export default new Router({
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
     },
+    {
+      path: '/upload',
+      name: 'Snippet upload',
+      component: () => import('@/views/upload.vue'),
+    },
+    {
+      path: '/show/:snip',
+      name: 'Snippet',
+      component: () => import('@/views/show.vue'),
+    },
+    {
+      path: '/list',
+      name: 'Snippets list',
+      component: () => import('@/views/list.vue'),
+    },
   ],
 });
