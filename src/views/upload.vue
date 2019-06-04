@@ -2,11 +2,11 @@
   <div id='container'>
     <!-- Here will be usage instruction for form. -->
     <div id="form_description">
-      <h2>Snippet creation form.</h2>
+      <h2>Форма создания сниппета.</h2>
       <div>
-        You can enter text into field, select file to upload from your system and enter reference to file at remote server.<br>
-        Public snippet appears in snippets list and clickable, 
-        private snippet accessible through input reference like <b>/snippet/{snippet_name}</b> only.<br> Please specify the programming language for each snippet's fragment. Following languages are supported by system: PYTHON, PHP, JAVASCRIPT, HTML, CSS,
+        Вы можете сохранять фрагменты кода в текстовом поле ввода, загружать файлы из вашей системы или ввести ссылки на текстовые файлы на сторонних ресурсах.<br>
+        Публичные сниппеты отображаются в списке и кликабельны,
+        скрытые - на отображаются, и доступны только при введении ссылки вида: <b>/snippet/{snippet_name}</b> only.<br> Пожалуйста, указывайте язык программирования для каждого фрагмента кода. Синтаксис следующих языков распознается системой: PYTHON, PHP, JAVASCRIPT, HTML, CSS. 
       </div>
     </div>
 
@@ -14,88 +14,139 @@
     <form @submit.prevent="">
       <!-- Snippet's name -->
       <div id='name'>
-        <label>Snippet's name:<br>
-        <input type='text' class="name_and_description" v-model="snippet_name">
+        <label>Название сниппета:<br>
+        <input type='text' class="name_and_description" placeholder='Название сниппета' 
+        v-model="snippet_name">
         </label>
       </div>
 
   <!-- Snippets description -->
       <div id='description'>
-        <label>Snippet's description:<br>
-        <textarea id='description_textarea' class="name_and_description" v-model="snippet_descript"></textarea>
+        <label>Описание сниппета:<br>
+        <textarea id='description_textarea' class="name_and_description" 
+        placeholder='Здесь опишите функционал сниппета и инструкции по использованию.'
+        v-model="snippet_descript">
+        </textarea>
         </label>
       </div>
 
   <!-- Privacy selector -->
       <div id='privacy_selector'>
-        <label>Privacy:<br>
+        <label>Приватность:<br>
+        
         <input type='radio' name = 'privacy' value='true' checked v-model="public_flag">
-        <span id='left_span'>Public</span>
+
+        <span id='left_span'>Публичный</span>
         <input type='radio' name = 'privacy' value='' v-model="public_flag">
-        <span>Private</span>
+        <span>Скрытый</span>
         </label>
       </div>
 
   <!-- Field for snippet input as text. -->
       <div id="text_field_div">
-        <label>Input fragment's title and text here:<br>
-        <input type='text' v-model='text_field_header'>
-        <input type='text' v-model='text_field_lang'>
-        <textarea id="text" v-model="text_field_cont"></textarea>
+        <label>Введите заголовок и текст фрагмента:<br>
+        <input type='text' placeholder='Заголовок фрагмента' v-model='text_field_header'>
+        <!--input type='text' v-model='text_lang_field'-->
+
+        <span id='text_lang_title'>язык программирования: </span>
+        <select id='text_lang_select' v-model='text_lang_field'>
+          <option value='' selected>не выбран</option>
+          <option value='Python'>Python</option>
+          <option value='Javascript'>Javascript</option>
+          <option value='HTML'>HTML</option>
+          <option value='CSS'>CSS</option>
+          <option value='SQL'>SQL</option>
+          <option value='PHP'>PHP</option>
+          <option value='Perl'>Perl</option>
+          <option value='Ruby'>Ruby</option>
+          <option value='Shell'>Shell</option>
+
+        </select>
+
+        <textarea id="text" placeholder='Текст фрагмента' v-model="text_field_cont"></textarea>
         </label>
+
         <!-- Button "add fragment" -->
-        
-        <button id='ref_add_but' class='ref_buttons' @click="addText">Add fragment</button>
+        <button id='ref_add_but' class='ref_buttons' @click="addText">Добавить фрагмент</button>
         <!-- Button "remove reference" -->
-        <button id='ref_clear_but' class='ref_buttons' @click="removeText">Remove fragment</button>
+        <button id='ref_clear_but' class='ref_buttons' @click="removeText">Удалить фрагмент</button>
         <!-- Fragments list -->
         <ul id='refs_list'>
-          <li v-for='title in text_headers_arr'>{{ title }}</li>
+          <li v-for='title in this.$store.state.text_headers_arr'>{{ title }}</li>
         </ul>
       </div>
 
   <!-- Field for snippet input as files, uploaded from user's browser. -->
       <span id="file_field_span" class='lower_row'>
-        <div id="file_header">Select text file to upload</div>
-        <input type='text' class='lower_row_lang' v-model='file_lang_field'>
+        <div id="file_header">
+          Выберите текстовый файл для загрузки.<br>
+          Перед загрузкой файла укажите язык программирования.
+        </div>
+        <!--input type='text' class='lower_row_lang' v-model='file_lang_field'-->
+
+        <span id='file_lang_title'>язык программирования: </span>
+        <select v-model='file_lang_field'>
+          <option value='' selected>не выбран</option>
+          <option value='Python'>Python</option>
+          <option value='Javascript'>Javascript</option>
+          <option value='HTML'>HTML</option>
+          <option value='CSS'>CSS</option>
+          <option value='SQL'>SQL</option>
+          <option value='PHP'>PHP</option>
+          <option value='Perl'>Perl</option>
+          <option value='Ruby'>Ruby</option>
+          <option value='Shell'>Shell</option>
+        </select>
+
         <!-- button "Add file" -->
         <div id='add_file_div' class='file_buttons'>
           <label>
             <input type="file" id="file_input" v-on:change="handleFile($event)">
-            <span id='filename_span'>Add file</span>
+            <span id='filename_span'>Добавить файл</span>
           </label>
         </div>
         <!-- Button "Remove file" -->
-        <button id='file_clear_but' class='file_buttons' @click="removeFile">Remove file</button>
+        <button id='file_clear_but' class='file_buttons' @click="removeFile()">Удалить файл</button>
         <!-- Here will be uploaded files list. -->
         <ul id='files_list'>
-          <li v-for='name in files_arr'>{{ name }}</li>
+          <li v-for='name in this.$store.state.files_arr'>{{ name }}</li>
         </ul>
       </span>
 
   <!-- Field for snippet input as references to text files. -->
       <span id="ref_field_span" class='lower_row'>
         <!-- Field for reference input -->
-        <label>Input your reference to text file here:<br>
-        <input type='text' class='lower_row_lang' v-model='ref_lang_field'>
-        <input type="text" id="ref" v-model="ref_field_cont">
+        <label>Введите ссылку на текстовый файл:<br>
+        <!--input type='text' class='lower_row_lang' v-model='ref_lang_field'-->
+        
+        <span id='ref_lang_title'>язык программирования: </span>
+        <select v-model='ref_lang_field'>
+          <option value='' selected>не выбран</option>
+          <option value='Python'>Python</option>
+          <option value='Javascript'>Javascript</option>
+          <option value='HTML'>HTML</option>
+          <option value='CSS'>CSS</option>
+          <option value='SQL'>SQL</option>
+          <option value='PHP'>PHP</option>
+          <option value='Perl'>Perl</option>
+          <option value='Ruby'>Ruby</option>
+          <option value='Shell'>Shell</option>
+        </select>
+        
+        <input type="text" id="ref" placeholder='Ссылка на файл' v-model="ref_field_cont">
         </label>
         <!-- Button "add reference" -->
-        <button id='ref_add_but' class='ref_buttons' @click="addRef">Add reference</button>
+        <button id='ref_add_but' class='ref_buttons' @click="addRef">Добавить ссылку</button>
         <!-- Button "remove reference" -->
-        <button id='ref_clear_but' class='ref_buttons' @click="removeRef">Remove reference</button>
+        <button id='ref_clear_but' class='ref_buttons' @click="removeRef">Удалить ссылку</button>
         <!-- Here will be uploaded refs list. -->
         <ul id='refs_list'>
-          <li v-for='name in refs_arr'>{{ name }}</li>
+          <li v-for='name in this.$store.state.refs_arr'>{{ name }}</li>
         </ul>
 
       </span>
 
-      <!-- Button for uploading filled form. -->
-      <div v-if='no_data_flag'> 
-        There is no data to upload.
-      </div>
-      <button id="btn_upload" @click="upload"><b>Upload</b></button>
+      <button id="btn_upload" @click="upload"><b>Схоронить</b></button>
 
     </form>
   </div>
@@ -105,142 +156,214 @@
 
 <script type="text/javascript">
 export default {
-
+  name: 'upload',
   data() {
     return {
-      // For whole snippet.
-      snippet_name: '',
-      snippet_descript: '',
-      public_flag: 'true',
-      // For text input field.
-      text_field_header: 'Title',
-      text_field_lang: 'Language',
-      text_field_cont: 'Content',
-      text_headers_arr: [],
-      text_lang_arr: [],
-      text_cont_arr: [],
-      // For reference selection.
-      ref_field_cont: 'Reference',
-      ref_lang_field: 'Language',
-      refs_arr: [],
-      refs_lang_arr: [],
-      // For file selection.
-      files_arr: [],   // For output selected filenames 
-      file_lang_field: 'Language',
-      file_lang_arr: [],
-      file_content: [],    // Contains data from selected files.
-
-      no_data_flag: false,
-    };
+      // All variables in store.
+    }
   },
 
-  methods: {
-    
-    addText() {
-      this.text_headers_arr.append(this.text_field_header);
-      this.text_lang_arr.append(this.text_field_lang);
-      this.text_cont_arr.append(this.text_field_cont);
-
-      this.text_field_header = 'Title';
-      this.text_field_lang = 'Language';
-      this.text_field_cont = 'Text';
+  computed: {
+    // Form headers
+    snippet_name: {
+      get() {return this.$store.state.snippet_name; },
+      set(value) {this.$store.commit('SetSnippetName', value); },
     },
-    
+    snippet_descript: {
+      get() {return this.$store.state.snippet_descript; },
+      set(value) {this.$store.commit('SetSnippetDescript', value); },
+    },
+    public_flag: {
+      get() {return this.$store.state.public_flag; },
+      set(value) {this.$store.commit('SetPublicFlag', value); },
+    },
+
+    // Text input field
+    text_field_header: {
+      get() {return this.$store.state.text_field_header; },
+      set(value) {this.$store.commit('SetTextFieldHeader', value); },
+    },
+    text_lang_field: {
+      get() {return this.$store.state.text_lang_field; },
+      set(value) {this.$store.commit('SetTextFieldLang', value); },
+    },
+    text_field_cont: {
+      get() {return this.$store.state.text_field_cont; },
+      set(value) {this.$store.commit('SetTextFieldCont', value); },
+    },
+
+    // Files field
+    file_lang_field: {
+      get() {return this.$store.state.file_lang_field; },
+      set(value) {this.$store.commit('SetFileLangField', value); },
+    },
+    // References field
+    ref_lang_field: {
+      get() {return this.$store.state.ref_lang_field; },
+      set(value) {this.$store.commit('SetRefLangField', value); },
+    },
+    ref_field_cont: {
+      get() {return this.$store.state.ref_field_cont; },
+      set(value) {this.$store.commit('SetRefFieldCont', value); },
+    },
+  },
+
+  /********************************************************************************/
+
+  methods: {
+
+    addText() {
+      let cond1 = Boolean(this.text_field_header);
+      let cond2 = Boolean(this.text_field_cont);
+      
+      if (cond1 && cond2) {
+        this.$store.commit('AddToTextObj');
+      
+        this.$store.commit('SetTextFieldHeader', '');
+        this.$store.commit('SetTextFieldLang', '');
+        this.$store.commit('SetTextFieldCont', '');
+      }
+      else {
+        let message_object = {
+          'text': 'Текст или заголовок не введен.',
+          'type': 'alert',
+        }
+        this.$store.commit('AddNote', message_object);
+      }
+    },
+
     removeText() {
-      this.text_headers_arr.pop();
-      this.text_lang_arr.pop();
-      this.text_cont_arr.pop();
+      this.$store.commit('RemoveFromTextObj');
     },
 
     handleFile(evt) {
       /* Reads data from selected text file and save it in variable. */
-      this.files_arr.push(evt.target.files[0].name);
-      this.file_lang_arr.push(this.file_lang_field);
       const reader = new FileReader();
-      reader.onload = (event) => { // evt
-        this.file_content.push(event.target.result);
-        //console.log(this.file_content);
+      reader.onload = (event) => {
+        
+        let file_cont = {}
+        file_cont.name = evt.target.files[0].name;
+        file_cont.content = event.target.result;
+        file_cont.language = this.file_lang_field;
+
+        this.$store.commit('AddToFilesObj', file_cont);
+        this.file_lang_field = '';
       };
       reader.readAsText(evt.target.files[0]);
     },
-    
+
     removeFile() {
       /* Remove last file from upload files arr and it's data from content arr. */
-      this.files_arr.pop();
-      this.file_lang_arr.pop();
-      this.file_content.pop();
+      this.$store.commit('RemoveFromFilesObj');
     },
-    
+
     addRef() {
       /* Adds ref to the end of refs array. */
-      if (this.ref_field_cont.slice(0,4).toLowerCase() == 'http') {
-        this.refs_arr.push(this.ref_field_cont);
-        this.refs_lang_arr.push(this.ref_lang_field);
-        this.ref_field_cont = 'Referencee';
+      if (this.ref_field_cont.slice(0, 4).toLowerCase() == 'http') {
+        this.$store.commit('AddToRefsObj');
+        this.$store.commit('SetRefLangField', '');
+        this.$store.commit('SetRefFieldCont', '');
+      }
+      else {
+        let message_object = {
+          'text': 'Это не похоже на ссылку.',
+          'type': 'alert',
+        }
+        this.$store.commit('AddNote', message_object);
       }
     },
-    
+
     removeRef() {
       /* Removes last ref from the refs array. */
-      this.refs_arr.pop();
-      this.refs_lang_arr.pop();
+      this.$store.commit('RemoveFromRefsObj');
     },
-    
+
     upload() {
       /* Handle data from form and then upload it to the server. */
       // checks data presence
-      let cond1 = this.files_arr.length != 0;
-      let cond2 = this.refs_arr.length != 0;
-      let cond3 = this.text_headers_arr.length != 0;
+      const cond1 = this.$store.state.files_arr.length != 0;
+      const cond2 = this.$store.state.refs_arr.length != 0;
+      const cond3 = this.$store.state.text_headers_arr.length != 0;
+
+      const cond4 = Boolean(this.snippet_name);
+      const cond5 = Boolean(this.snippet_descript);
 
       // if there are some data.
-      if (cond1 || cond2 || cond3) {
+      if (cond4 && cond5 && (cond1 || cond2 || cond3)) {
         let formData = new FormData();
-        formData.append('name', this.snippet_name);
-        formData.append('description', this.snippet_descript);
-        formData.append('public_flag', this.public_flag);
+        
+        let snippet_info = {
+          'name': this.snippet_name,
+          'description': this.snippet_descript,
+          'public_flag': Boolean(this.public_flag),
+        }
+        formData.append('info', JSON.stringify(snippet_info));
 
         // if there are uploaded files
         if (cond1) {
-          // Adds filenames and files content to FormData object.
-          formData.append('filenames', this.files_arr);
-          formData.append('files_languages', this.file_lang_arr);
-          formData.append('files_content', this.file_content);
+          // Adds files to FormData object.
+          formData.append('files', JSON.stringify(this.$store.state.files_obj));
         }
-        
+
         // if there are references
         if (cond2) {
-          formData.append('refs', this.refs_arr);
-          formData.append('refs_languages', this.refs_lang_arr);
+          formData.append('refs', JSON.stringify(this.$store.state.refs_obj));
         }
         // if there is text in textarea
         if (cond3) {
-          formData.append('text_headers', this.text_headers_arr);
-          formData.append('text_languages', this.text_lang_arr);
-          formData.append('text', this.text_cont_arr);
+          formData.append('text', JSON.stringify(this.$store.state.text_obj));
         }
 
         // Set the config for request.
-        let upload_conf = {
+        const upload_conf = {
           method: 'post',
           url: '/upload',
-          headers: {'Content-Type': 'multipart/form-data',},
+          headers: { 'Content-Type': 'multipart/form-data' },
           data: formData,
-        }
+        };
         // Sends request with FormData object to the server.
         this.axios(upload_conf)
-          .then(response => {
+          .then((response) => {
             // Handle answer from server.
-            console.log('Request received section.');
-            console.log(response.data['message']);
+            // type of note-message: ok, info, alert, error
+            let msg_type;
+            if (response.status == 201) {
+              msg_type = 'ok'
+            }
+            else if (response.status == 500) {
+              msg_type = 'error'
+            }
+            else if (response.status == 406) {
+              msg_type = 'alert'
+            }
+
+            let message_object = {
+              'text': response.data.message,
+              'type': msg_type,
+            }
+            this.$store.commit('AddNote', message_object);
+            console.log(response.data.message);
           })
-          .catch(error => {console.log('Something goes wrong:', error);});
+          .catch((error) => {
+            let from = error.response.data.message.indexOf("DETAIL:");
+            let by = error.response.data.message.indexOf("\n", from);
+            let message_object = {
+              'text': error.response.data.message.substring(from+8, by),
+              //'text': error,
+              'type': 'error',
+            }
+            this.$store.commit('AddNote', message_object);
+            //console.log('Something goes wrong:', error.response.data.message); 
+          });
         console.log('Request sended');
-      }
+      } 
       else {
-        // If there no any data, sets flag to show message about it.
-        this.no_data_flag = true;
-        setTimeout(() => {this.no_data_flag = false}, 6000);
+        // If some data are missing.
+        let message_object = {
+          'text': 'Не все данные введены.',
+          'type': 'alert',
+        }
+        this.$store.commit('AddNote', message_object);
       }
     },
   },
@@ -271,13 +394,18 @@ form {
 
   // For all input fields in form.
   input,
-  textarea {
+  textarea,
+  select {
     font: 14px sans-serif;
     color: black;
     text-align: left;
     margin-top: 1em;
     background: white;
     .border-style(5px, @light-gray);
+  }
+  select {
+    appearance: none;
+    //width: 43%;
   }
 
   // For "upload" button.
@@ -322,7 +450,7 @@ form {
   }
 }
 
-// For row with file uoload and reference input
+// For row with file upload and reference input
 .lower_row {
   display: inline-block;
   vertical-align: top;
@@ -341,6 +469,12 @@ form {
   }
   #file_header {
     margin-top: 10px;
+  }
+  #file_lang_title {
+    padding-right: 6%;
+  }
+  select {
+    width: 43%;
   }
 }
 #file_input {
@@ -361,7 +495,6 @@ form {
     color: @main-color;
     background: white;
   }
-
 }
 #file_clear_but,
 .ref_buttons {
@@ -387,6 +520,9 @@ form {
     width: 84%;
     height: 20px;
   }
+  #ref_lang_title {
+    padding-right: 5%;
+  }
   label {
     display: block;
     margin-top: 10px;
@@ -394,6 +530,9 @@ form {
   ul {
     text-align: left;
     padding-left: 10%;
+  }
+  select {
+    width: 43%;
   }
 }
 
@@ -409,10 +548,16 @@ form {
     width: 92%;
     height: 200px;
   }
+  #text_lang_title {
+    padding-right: 2%;
+  }
   input {
     display: inline-block;
-    margin: 10px 10px 0;
-    width: 45%;
+    margin: 10px 5% 10px 0;
+    width: 48%;
+  }
+  select {
+    width: 20%;
   }
 }
 </style>
