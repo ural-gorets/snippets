@@ -342,7 +342,6 @@ export default {
               'type': msg_type,
             }
             this.$store.commit('AddNote', message_object);
-            console.log(response.data.message);
           })
           .catch((error) => {
             let from = error.response.data.message.indexOf("DETAIL:");
@@ -355,7 +354,6 @@ export default {
             this.$store.commit('AddNote', message_object);
             //console.log('Something goes wrong:', error.response.data.message); 
           });
-        console.log('Request sended');
       } 
       else {
         // If some data are missing.
@@ -386,10 +384,10 @@ export default {
 
 form {
   // Form border
-  .border-style(10px, @main-color);
+  .border-style(3px, @main-color);
   position: relative;
   width: 90%;
-  margin: 20px auto 0;
+  margin: 20px auto;
   padding-top: 10px;
 
   // For all input fields in form.

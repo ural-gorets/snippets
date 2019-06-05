@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import './plugins/vuetify'
+import Vuetify from 'vuetify';
+import './plugins/vuetify';
 import './plugins/axios';
 import App from './App.vue';
 import router from './router';
@@ -10,6 +11,7 @@ import Notifications from '@/components/notifications.vue';
 // import them from other components or views. 
 // Just use the appropriate tags.
 Vue.component('notifications', Notifications);
+//Vue.use(Vuetify);
 
 Vue.config.productionTip = false;
 
@@ -18,3 +20,5 @@ new Vue({
   store,
   render: h => h(App),
 }).$mount('#app');
+
+Vue.use(Vuetify);

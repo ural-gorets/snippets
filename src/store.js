@@ -36,6 +36,11 @@ export default new Vuex.Store({
     allowed_languages: [],
     langs_stats: {},
     snippets_obj: {},
+    // languages block on snippets list
+    tooltip_show: false,
+    // Snippet page
+    snippet: {},
+    files: {},
   },
   mutations: {
   // upload form
@@ -147,10 +152,20 @@ export default new Vuex.Store({
       state.allowed_languages = langs;
     },
     SetLangsStats(state, langs) {
-      state.langs_stats = langs;
+      state.langs_stats = Object.assign({}, langs);
     },
     SetSnippetsObj(state, snippets) {
-      state.snippets_obj = snippets;
+      state.snippets_obj = Object.assign({}, snippets);
+    },
+    TooltipInvert(state) {
+      state.tooltip_show = !state.tooltip_show;
+    },
+  // Snippet page
+    SetSnippet(state, snip) {
+      state.snippet = Object.assign({}, snip);
+    },
+    SetFiles(state, files) {
+      state.files = Object.assign({}, files);
     },
   },
   actions: {
