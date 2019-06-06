@@ -37,11 +37,14 @@ export default new Vuex.Store({
     langs_stats: {},
     snippets_obj: {},
     // languages block on snippets list
-    tooltip_show: false,
+
     // Snippet page
     snippet: {},
     files: {},
   },
+
+/******************************************************************************************/
+
   mutations: {
   // upload form
     // form headers
@@ -156,9 +159,6 @@ export default new Vuex.Store({
     },
     SetSnippetsObj(state, snippets) {
       state.snippets_obj = Object.assign({}, snippets);
-    },
-    TooltipInvert(state) {
-      state.tooltip_show = !state.tooltip_show;
     },
   // Snippet page
     SetSnippet(state, snip) {

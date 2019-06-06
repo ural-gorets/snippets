@@ -5,13 +5,15 @@
     
     <!-- Languages block -->
     <v-card id="lang_list">
-      <code class='lang_tile' v-for='(lang, index) in allowed_languages' v-bind:key='index'
-            @mouseenter='tooltip_show_func' @mouseleave='tooltip_show_func'>
-        <div>{{ index+1}}. {{ lang }}</div>
-        <!--v-tooltip bottom attach='.lang_tile' v-model='actual_page'>
-          <span>This is tooltip</span>
-        </v-tooltip-->
+      
+      <code class='lang_tile' v-bind:id='lang'
+            v-for='(lang, index) in allowed_languages' v-bind:key='index'>
+        <div><h3>{{ index+1}}.{{ lang }}</h3>
+             <p>Фрагментов: {{ langs_stats[lang].amount }}</p>
+             <p>Доля: {{ langs_stats[lang].percent }}%</p>
+        </div>
       </code>
+
     </v-card>
     
     <!-- Snippets list block -->
@@ -30,7 +32,10 @@
             <v-card>
               <a class='snippet_ref' v-bind:href='snippet.reference'>
               
-                <v-card-title><h3>{{ index+1 }}. {{ name }}</h3></v-card-title>
+                <v-card-title>
+                  <h3>{{ index+1 }}. {{ name }}</h3>
+                  <span class='born_date'>Создан {{ snippet.date.substring(0, 19) }}</span>
+                </v-card-title>
 
                 <v-divider></v-divider>
 
@@ -65,6 +70,8 @@
   </v-container>
 </template>
 
+/******************************************************************************************/
+
 <script type="text/javascript">
 export default {
 name: 'snippets_list',
@@ -93,15 +100,11 @@ name: 'snippets_list',
     langs_stats: {
       get() {return this.$store.state.langs_stats},
     },
-    tooltip_show: {  // For showing statictics in tooltips. Project.
-      get() {return this.$state.state.tooltip_show},
-    },
   },
+
+/******************************************************************************************/
+
   methods: {
-    // Languages statistics.
-    tooltip_show_func() {
-      this.$store.commit('TooltipInvert');
-    },
     // Main method, getting all data from back.
     get_data(page) {
       // create request config.
@@ -132,11 +135,19 @@ name: 'snippets_list',
             if (response.status == 200) {
               // Converting object from JSON
               let data_object = JSON.parse(response.data);
-              console.log('data_object: ', data_object);
               // allowed languages list extraction
               this.$store.commit('SetAllowedLanguages', data_object.allowed_languages);
+
               // languajes statistics extraction
-              this.$store.commit('SetLangsStats', data_object.languages);
+              let langstat = Object.assign({}, data_object.languages);
+              for (let lang of data_object.allowed_languages) {
+                if (!langstat[lang]) {
+                  langstat[lang] = {"amount": 0,
+                                   "percent": 0,}
+                }
+              }
+              this.$store.commit('SetLangsStats', langstat);
+
               // pages amount extraction
               this.$store.commit('SetPages', data_object.pages);
               // snippets list extraction
@@ -157,16 +168,17 @@ name: 'snippets_list',
           console.log('Request to the API sent.');
     },
   },
-  // Whel page loads, call for data.
+  // When page loads, call for data.
   beforeMount: function() {
     this.get_data(this.$store.state.actual_page);
   },
 };
 </script>
 
-<style lang='less'>
+/******************************************************************************************/
+
+<style scoped lang='less'>
 // Declaring variables
-@light-gray: #D6D6d6;      // for borders
 @main-color: #3581de;
 @gray-text: #616161;
 @blue-background: #e3f2fd;
@@ -184,17 +196,24 @@ name: 'snippets_list',
 }
 .lang_tile {
   display: inline-block;
-  width: 120px;
-  height: 30px;
+  width: 125px;
+  height: 65px;
   margin: 5px;
   vertical-align: middle;
   text-align: center;
-
   background: @blue-background;
   color: @gray-text;
   div {
     display: inline-block;
     margin-top: 5px;
+  }
+  h3 {
+    text-align: left;
+  }
+  p {
+    margin: 0;
+    text-align: left;
+    font-weight: 100;
   }
 }
 
@@ -222,6 +241,10 @@ name: 'snippets_list',
   .snippet_ref {
     text-decoration: none;
     color: black;
+  }
+  .born_date {
+    //display: inline-block;
+    margin-left: auto;
   }
 }
 </style>

@@ -152,7 +152,7 @@
   </div>
 </template>
 
-/*******************************************************************************/
+/******************************************************************************************/
 
 <script type="text/javascript">
 export default {
@@ -208,7 +208,7 @@ export default {
     },
   },
 
-  /********************************************************************************/
+/******************************************************************************************/
 
   methods: {
 
@@ -325,6 +325,8 @@ export default {
         this.axios(upload_conf)
           .then((response) => {
             // Handle answer from server.
+            // parsing json
+            let data_object = JSON.parse(response.data);
             // type of note-message: ok, info, alert, error
             let msg_type;
             if (response.status == 201) {
@@ -338,10 +340,14 @@ export default {
             }
 
             let message_object = {
-              'text': response.data.message,
+              'text': data_object.message,
               'type': msg_type,
             }
             this.$store.commit('AddNote', message_object);
+            // redirect to the snippets page if cuccess.
+            if (response.status == 201) {
+              this.$router.push(`/show/${data_object.reference}`);
+            }
           })
           .catch((error) => {
             let from = error.response.data.message.indexOf("DETAIL:");
@@ -368,9 +374,9 @@ export default {
 };
 </script>
 
-/*******************************************************************************/
+/******************************************************************************************/
 
-<style lang="less">
+<style scoped lang="less">
 
 // Declaring variables
 @light-gray: #D6D6d6;      // for borders

@@ -15,8 +15,8 @@
         <!-- Reference-->
         <v-card-text class='pb-3 pt-2'>
           <div v-if='snippet.public_flag'>Сниппет доступен по ссылке:</div>
-          <div v-else-if='snippet.public_flag'>Это скрытый сниппет. Он доступен ТОЛЬКО по данной ссылке:</div>
-          <code class='code' id='reference'>{{ this.$axios.defaults.baseURL }}/show/{{ this.$route.params.snip }}</code>
+          <div v-else-if='!snippet.public_flag'>Это скрытый сниппет. Он доступен ТОЛЬКО по данной ссылке.<br> Сохраните её любым удобным способом.</div>
+          <code class='code' id='reference'>{{ app_url }}/show/{{ this.$route.params.snip }}</code> 
         </v-card-text>
 
         <v-divider></v-divider>
@@ -30,7 +30,7 @@
         </v-card-text>
       </v-card>
       
-      <!-- Here shoul be files -->
+      <!-- fragments -->
       <v-card class='mt-3' v-for='(file, name, index) in files' v-bind:key='index'>
         <v-card-title>
           <h2 class='fragment_header'>{{ index+1 }}. {{ name }}</h2>
@@ -42,20 +42,18 @@
         <v-divider></v-divider>
 
         <v-card-text>
-          <code class='fragment_code'>
+          <highlight-code class='fragment_code' v-bind:lang='file.lang.toLowerCase()'>
             {{ file.data }}
-          </code>
+          </highlight-code>
         </v-card-text>
       </v-card>
 
-      <div></div>
-      <div></div>
-      <div></div>
     </div>
 
   </div>
 </template>
 
+/******************************************************************************************/
 
 <script type="text/javascript">
 export default {
@@ -87,7 +85,14 @@ name: 'snippet',
       }
       return languages;
     },
+    app_url() {
+      console.log('location.origin: ', location.origin);
+      return location.origin;
+    },
   },
+
+/******************************************************************************************/
+
   methods: {
     // Main method, downloads all data from back.
     get_snippet_data() {
@@ -119,7 +124,6 @@ name: 'snippet',
             if (response.status == 200) {
               // Converting object from JSON
               let data_object = JSON.parse(response.data);
-              console.log('data_object: ', data_object);
               // snippet info extraction
               this.$store.commit('SetSnippet', data_object.snippet);
               // Snippet's files extraction
@@ -137,20 +141,19 @@ name: 'snippet',
             this.$store.commit('AddNote', message_object);
             //console.log('Something goes wrong:', error.response.data.message); 
           });
-          console.log('Request to the API sent.');
     },
   },
-  // Whel page loads, call for data.
+  // When page loads, call for data.
   beforeMount: function() {
     this.get_snippet_data();
   },
 };
 </script>
 
+/******************************************************************************************/
 
-<style lang='less'>
+<style scoped lang='less'>
 // Declaring variables
-@light-gray: #D6D6d6;      // for borders
 @main-color: #3581de;
 @gray-text: #616161;
 @blue-background: #e3f2fd;
@@ -194,14 +197,12 @@ name: 'snippet',
     text-align: right;
   }
   // fragments
-  
-  .fragment_code {
+  .hljs {
     width: 100%;
-    color: @gray-text;
-    background: @blue-background;
     text-align: left;
-    padding: 0 20px;
+    background: @blue-background;
   }
+
   .fragment_header {
     text-align: left;
     padding-left: 20px
