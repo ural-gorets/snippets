@@ -78,8 +78,9 @@ export default new Vuex.Store({
           {}, text_cont);
       state.text_headers_arr.push(state.text_field_header);
     },
-    RemoveFromTextObj(state) {
-      delete state.text_obj[state.text_headers_arr.pop()];
+    RemoveFromTextObj(state, index) {
+      //delete state.text_obj[state.text_headers_arr.pop()];
+      delete state.text_obj[state.text_headers_arr.splice(index, 1)];
     },
     ResetTextObj(state) {
       state.text_obj = {};
@@ -99,8 +100,9 @@ export default new Vuex.Store({
 
       state.files_obj[payload.name] = Object.assign({}, file_cont);
     },
-    RemoveFromFilesObj(state) {
-      delete state.files_obj[state.files_arr.pop()];
+    RemoveFromFilesObj(state, index) {
+      //delete state.files_obj[state.files_arr.pop()];
+      delete state.files_obj[state.files_arr.splice(index, 1)];
     },
     ResetFilesObj(state) {
       state.files_obj = {};
@@ -116,8 +118,9 @@ export default new Vuex.Store({
       state.refs_obj[state.ref_field_cont] = state.ref_lang_field;
       state.refs_arr.push(state.ref_field_cont);
     },
-    RemoveFromRefsObj(state) {
-      delete state.refs_obj[state.refs_arr.pop()];
+    RemoveFromRefsObj(state, index) {
+      //delete state.refs_obj[state.refs_arr.pop()];
+      delete state.refs_obj[state.refs_arr.splice(index, 1)];
     },
     ResetRefsObj(state) {
       state.refs_obj = {};

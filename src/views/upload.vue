@@ -19,7 +19,7 @@
 
 
     <div id='tabs_container'>
-      <v-card height='580px'
+      <v-card min-height='580px'
               >
         
         <v-tabs v-model='current_tab'
@@ -123,16 +123,10 @@
                   </v-select>
                 </v-flex>
 
-
                 <!-- Button "add fragment" -->
-                <button class='ref_buttons' @click="addText">Добавить фрагмент</button>
-                <!-- Button "remove reference" -->
-                <button id='ref_clear_but' class='ref_buttons' @click="removeText">Удалить фрагмент</button>
-
-                <!-- Fragments list -->
-                <ul id='refs_list'>
-                  <li v-for='title in this.$store.state.text_headers_arr'>{{ title }}</li>
-                </ul>
+                <button type='button' class='ref_buttons' @click="addText" >
+                  Добавить фрагмент
+                </button>
 
               </form>
             </v-tab-item>
@@ -154,12 +148,6 @@
                   </v-select>
                 </v-flex>
 
-
-
-
-                <!-- Field for snippet input as files, uploaded from user's browser. -->
-                <span id="file_field_span" class='lower_row'>
-                  
                   <!-- button "Add file" -->
                   <div id='add_file_div' class='file_buttons'>
                     <label>
@@ -167,13 +155,6 @@
                       <span id='filename_span'>Добавить файл</span>
                     </label>
                   </div>
-                  <!-- Button "Remove file" -->
-                  <button id='file_clear_but' class='file_buttons' @click="removeFile()">Удалить файл</button>
-                  <!-- Here will be uploaded files list. -->
-                  <ul id='files_list'>
-                    <li v-for='name in this.$store.state.files_arr'>{{ name }}</li>
-                  </ul>
-                </span>
 
               </form>
             </v-tab-item>
@@ -203,23 +184,49 @@
                   </v-select>
                 </v-flex>
 
-                
-                  <!-- Button "add reference" -->
-                  <button id='ref_add_but' class='ref_buttons' @click="addRef">Добавить ссылку</button>
-                  <!-- Button "remove reference" -->
-                  <button id='ref_clear_but' class='ref_buttons' @click="removeRef">Удалить ссылку</button>
-                  <!-- Here will be uploaded refs list. -->
-                  <ul id='refs_list'>
-                    <li v-for='name in this.$store.state.refs_arr'>{{ name }}</li>
-                  </ul>
-                </span>
+                <!-- Button "add reference" -->
+                <button type='button' class='ref_buttons' @click="addRef">
+                  Добавить ссылку
+                </button>
 
               </form>
             </v-tab-item>
           </v-tabs-items>
         </v-tabs>
 
-        <button id="btn_upload" @click="upload"><b>Схоронить</b></button>
+        <div id='lists_container'>
+          <!-- Text fragments list -->
+          <ul id='text_list' class='items_list'>
+            <li v-for='(title, index) in this.$store.state.text_headers_arr' v-bind:key='index'>
+              {{ title }}
+              <button type='button' class='file_remove' @click="removeText(index)">
+                убрать
+              </button>                      
+            </li>
+          </ul>
+
+          <!-- Here will be uploaded files list. -->
+          <ul id='files_list' class='items_list'>
+            <li v-for='(name, index) in this.$store.state.files_arr' v-bind:key='index'>
+              {{ name }}
+              <button type='button' class='file_remove' @click="removeFile(index)">
+                убрать
+              </button>      
+            </li>
+          </ul>
+
+          <!-- Here will be uploaded refs list. -->
+          <ul id='refs_list' class='items_list'>
+            <li v-for='(name, index) in this.$store.state.refs_arr' v-bind:key='index'>
+              {{ name }}
+              <button type='button' class='file_remove' @click="removeRef(index)">
+                убрать
+              </button>                      
+            </li>
+          </ul>
+        </div>
+
+        <button type='button' id="btn_upload" @click="upload"><b>Схоронить</b></button>
 
       </v-card>
     </div>
@@ -246,15 +253,6 @@ export default {
   },
 
   computed: {
-    
-    /* vvv FOR TABS vvv */
-
-
-
-
-    /* ^^^ FOR TABS ^^^ */
-
-
     // Form headers
     snippet_name: {
       get() {return this.$store.state.snippet_name; },
@@ -303,14 +301,6 @@ export default {
 
   methods: {
 
-    /* vvv FOR TABS vv */
-
-
-
-
-    /* ^^^ FOR TABS ^^^ */
-
-
     addText() {
       let cond1 = Boolean(this.text_field_header);
       let cond2 = Boolean(this.text_field_cont);
@@ -331,8 +321,8 @@ export default {
       }
     },
 
-    removeText() {
-      this.$store.commit('RemoveFromTextObj');
+    removeText(index) {
+      this.$store.commit('RemoveFromTextObj', index);
     },
 
     handleFile(evt) {
@@ -351,9 +341,9 @@ export default {
       reader.readAsText(evt.target.files[0]);
     },
 
-    removeFile() {
+    removeFile(index) {
       /* Remove last file from upload files arr and it's data from content arr. */
-      this.$store.commit('RemoveFromFilesObj');
+      this.$store.commit('RemoveFromFilesObj', index);
     },
 
     addRef() {
@@ -372,9 +362,9 @@ export default {
       }
     },
 
-    removeRef() {
+    removeRef(index) {
       /* Removes last ref from the refs array. */
-      this.$store.commit('RemoveFromRefsObj');
+      this.$store.commit('RemoveFromRefsObj', index);
     },
 
     upload() {
@@ -509,28 +499,31 @@ export default {
 }
 
 // For buttons.
-  // Upload button
-  #btn_upload {
-    height: 40px;
-    width: 200px;
-    margin: 3px auto;
-    font-size: 16px;
-    .border-style(3px, @main-color);
-    background: @main-color;
-    color: white;
-    .buttons-big-shadow();
-    &:hover {
-      background: white;
-      color: @main-color;
-    }
-    &:active {
-      background: white;
-      color: @main-color;
-      .buttons-small-shadow();
-    }
+// Upload button
+/*#btn_upload {
+  height: 40px;
+  width: 200px;
+  margin: 10px auto 25px;
+  font-size: 16px;
+  .border-style(3px, @main-color);
+  background: @main-color;
+  color: white;
+  .buttons-big-shadow();
+  &:hover {
+    background: white;
+    color: @main-color;
   }
+  &:active {
+    background: white;
+    color: @main-color;
+    .buttons-small-shadow();
+  }
+}*/
+// for rest of buttons
 .file_buttons,
-.ref_buttons {
+.ref_buttons,
+.file_remove,
+#btn_upload {
   display: inline-block;
   position: relative;
   width: 40%;
@@ -550,10 +543,35 @@ export default {
       background: white;
       color: @main-color;
       .buttons-small-shadow();
-    }
+  }
+}
+.file_remove {
+  height: 23px;
+  width: 80px;
+  margin: 5px 0 5px 20px ;
+}
+#btn_upload {
+  height: 40px;
+  width: 200px;
+  margin: 15px auto 25px;
+  font-size: 16px;
 }
 
-
+#file_input {
+  display: none;
+}
+#add_file_div {
+  height: 38px;
+  label{
+    display: block;
+    width:100%;
+    height: 100%
+  }
+}
+#filename_span {
+  display: block;
+  padding: 10px;
+}
 
 // Description
 #form_description {
@@ -573,7 +591,6 @@ export default {
     //width: 500px;
     margin: 0 auto;
   }
-
 }
 #public_description {
   font-size: 15px;
@@ -603,104 +620,24 @@ form {
   box-shadow: 0 2px 2px 0px #ababab,
              -2px 2px 2px 0px #f2f2f2,
               2px 2px 3px 0 #f2f2f2;
-  //position: relative;
   width: 95%;
   height: 420px;
   margin: 20px auto 16px;
   padding-top: 10px;
 }
 
-
-  /* ^^^ FOR TABS ^^^ */
-
-
-// For row with file upload and reference input
-.lower_row {
-  display: inline-block;
-  vertical-align: top;
-  margin-top: 30px;
-  width: 46%;
+// loaded items lists
+.items_list {
+  margin-left: 50px;
+  text-align: left;
 }
-.lower_row_lang {
-  width: 80%;
+#text_list {
+  color: #0d47a1;
 }
-
-// For file select field.
-#file_field_span {
-  ul {
-    text-align: left;
-    padding-left: 10%;
-  }
-  
-  #file_lang_title {
-    padding-right: 6%;
-  }
-  select {
-    width: 43%;
-  }
+#files_list {
+  color: #0091ea;
 }
-#file_input {
-  display: none;
-}
-
-#add_file_div {
-  height: 38px;
-  label{
-    display: block;
-    width:100%;
-    height: 100%
-  }
-  #filename_span {
-    display: block;
-    padding: 10px;
-  }
-}
-
-
-// For reference field.
-#ref_field_span {
-  input {
-    width: 84%;
-    height: 20px;
-  }
-  #ref_lang_title {
-    padding-right: 5%;
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-  }
-  ul {
-    text-align: left;
-    padding-left: 10%;
-  }
-  select {
-    width: 43%;
-  }
-}
-
-// For textarea field.
-#text_field_div {
-  display: block;
-  width: 100%;
-  label {
-    display: block;
-    margin-top: 10px;
-  }
-  #text {
-    width: 92%;
-    height: 200px;
-  }
-  #text_lang_title {
-    padding-right: 2%;
-  }
-  input {
-    display: inline-block;
-    margin: 10px 5% 10px 0;
-    width: 48%;
-  }
-  select {
-    width: 20%;
-  }
+#refs_list {
+  color: #00bfa5;
 }
 </style>
