@@ -1,154 +1,230 @@
 <template>
-  <div id='container'>
+  <div>
     <!-- Here will be usage instruction for form. -->
     <div id="form_description">
-      <h2>Форма создания сниппета.</h2>
-      <div>
-        Вы можете сохранять фрагменты кода в текстовом поле ввода, загружать файлы из вашей системы или ввести ссылки на текстовые файлы на сторонних ресурсах.<br>
-        Публичные сниппеты отображаются в списке и кликабельны,
-        скрытые - на отображаются, и доступны только при введении ссылки вида: <b>/snippet/{snippet_name}</b> only.<br> Пожалуйста, указывайте язык программирования для каждого фрагмента кода. Синтаксис следующих языков распознается системой: PYTHON, PHP, JAVASCRIPT, HTML, CSS. 
-      </div>
+      <v-card>
+        <v-card-title centered>
+          <h2>Форма создания сниппета.</h2>
+        </v-card-title>
+        <div id='description_text'>
+          <div class='description_paragraph'>
+            На соответствующих вкладках вы можете сохранять фрагменты кода в текстовом поле ввода, загружать файлы из вашей системы или ввести ссылки на текстовые файлы на сторонних ресурсах.
+          </div>
+          <div class='description_paragraph'>
+            Пожалуйста, указывайте язык программирования для каждого фрагмента кода. Системой распознается синтаксис следующих языков: PYTHON, PHP, RUBY, PERL, JAVASCRIPT, HTML, CSS, SQL, SHELL.
+          </div>
+        </div>
+      </v-card>
     </div>
 
-<!-- Upload form itself. -->
-    <form @submit.prevent="">
-      <!-- Snippet's name -->
-      <div id='name'>
-        <label>Название сниппета:<br>
-        <input type='text' class="name_and_description" placeholder='Название сниппета' 
-        v-model="snippet_name">
-        </label>
-      </div>
 
-  <!-- Snippets description -->
-      <div id='description'>
-        <label>Описание сниппета:<br>
-        <textarea id='description_textarea' class="name_and_description" 
-        placeholder='Здесь опишите функционал сниппета и инструкции по использованию.'
-        v-model="snippet_descript">
-        </textarea>
-        </label>
-      </div>
-
-  <!-- Privacy selector -->
-      <div id='privacy_selector'>
-        <label>Приватность:<br>
+    <div id='tabs_container'>
+      <v-card height='580px'
+              >
         
-        <input type='radio' name = 'privacy' value='true' checked v-model="public_flag">
+        <v-tabs v-model='current_tab'
+                slider-color='blue darken-2'
+                centered
+                class='pb-1'>
 
-        <span id='left_span'>Публичный</span>
-        <input type='radio' name = 'privacy' value='' v-model="public_flag">
-        <span>Скрытый</span>
-        </label>
-      </div>
+          <v-card-title>
+          <v-tab>
+            <span>Описание</span>
+          </v-tab>
 
-  <!-- Field for snippet input as text. -->
-      <div id="text_field_div">
-        <label>Введите заголовок и текст фрагмента:<br>
-        <input type='text' placeholder='Заголовок фрагмента' v-model='text_field_header'>
-        <!--input type='text' v-model='text_lang_field'-->
+          <v-tab>
+            <span>Ввод текста</span>
+          </v-tab>
 
-        <span id='text_lang_title'>язык программирования: </span>
-        <select id='text_lang_select' v-model='text_lang_field'>
-          <option value='' selected>не выбран</option>
-          <option value='Python'>Python</option>
-          <option value='Javascript'>Javascript</option>
-          <option value='HTML'>HTML</option>
-          <option value='CSS'>CSS</option>
-          <option value='SQL'>SQL</option>
-          <option value='PHP'>PHP</option>
-          <option value='Perl'>Perl</option>
-          <option value='Ruby'>Ruby</option>
-          <option value='Shell'>Shell</option>
+          <v-tab>
+            <span>Файлы</span>
+          </v-tab>
 
-        </select>
+          <v-tab>
+            <span>Ссылки</span>
+          </v-tab>
+          </v-card-title>
 
-        <textarea id="text" placeholder='Текст фрагмента' v-model="text_field_cont"></textarea>
-        </label>
+          <!--v-divider></v-divider-->
+          
+          <v-tabs-items v-model='current_tab'>
+            <!-- ############# Description ################# -->
+            <v-tab-item :transition='false' :reverse-transition='false'>
+              <form id='description_form'>
+                
+                <v-flex class='mt-2 mx-3'>
+                  <v-text-field label='Название сниппета'
+                                placeholder='Введите название'
+                                v-model='snippet_name'
+                                box>
+                  </v-text-field>
+                </v-flex>
 
-        <!-- Button "add fragment" -->
-        <button id='ref_add_but' class='ref_buttons' @click="addText">Добавить фрагмент</button>
-        <!-- Button "remove reference" -->
-        <button id='ref_clear_but' class='ref_buttons' @click="removeText">Удалить фрагмент</button>
-        <!-- Fragments list -->
-        <ul id='refs_list'>
-          <li v-for='title in this.$store.state.text_headers_arr'>{{ title }}</li>
-        </ul>
-      </div>
+                <v-flex class='mx-3'>
+                  <v-textarea label='Описание сниппета'
+                              placeholder='Здесь опишите функционал сниппета и инструкции по использованию.'
+                              v-model='snippet_descript'
+                              box>
+                  </v-textarea>
+                </v-flex>
 
-  <!-- Field for snippet input as files, uploaded from user's browser. -->
-      <span id="file_field_span" class='lower_row'>
-        <div id="file_header">
-          Выберите текстовый файл для загрузки.<br>
-          Перед загрузкой файла укажите язык программирования.
-        </div>
-        <!--input type='text' class='lower_row_lang' v-model='file_lang_field'-->
+                <v-flex class='mx-3'>
+                  <v-radio-group v-model='public_flag'
+                                 row>
+                    
+                    <div class='radio_item'>
+                    <v-radio label='Публичный'
+                             value='true'>
+                    </v-radio>
+                    </div>
 
-        <span id='file_lang_title'>язык программирования: </span>
-        <select v-model='file_lang_field'>
-          <option value='' selected>не выбран</option>
-          <option value='Python'>Python</option>
-          <option value='Javascript'>Javascript</option>
-          <option value='HTML'>HTML</option>
-          <option value='CSS'>CSS</option>
-          <option value='SQL'>SQL</option>
-          <option value='PHP'>PHP</option>
-          <option value='Perl'>Perl</option>
-          <option value='Ruby'>Ruby</option>
-          <option value='Shell'>Shell</option>
-        </select>
+                    <div>
+                    <v-radio label='Скрытый'
+                             value=''>
+                    </v-radio>
+                    </div>
 
-        <!-- button "Add file" -->
-        <div id='add_file_div' class='file_buttons'>
-          <label>
-            <input type="file" id="file_input" v-on:change="handleFile($event)">
-            <span id='filename_span'>Добавить файл</span>
-          </label>
-        </div>
-        <!-- Button "Remove file" -->
-        <button id='file_clear_but' class='file_buttons' @click="removeFile()">Удалить файл</button>
-        <!-- Here will be uploaded files list. -->
-        <ul id='files_list'>
-          <li v-for='name in this.$store.state.files_arr'>{{ name }}</li>
-        </ul>
-      </span>
+                  </v-radio-group>
+                  <div id='public_description'>
+                    Публичные сниппеты отображаются в списке и кликабельны,
+                    скрытые - не отображаются, и доступны только по ссылке вида: <b>http://{hostname}/show/{secret_snippet_name}</b>.
+                  </div>
+                </v-flex>
 
-  <!-- Field for snippet input as references to text files. -->
-      <span id="ref_field_span" class='lower_row'>
-        <!-- Field for reference input -->
-        <label>Введите ссылку на текстовый файл:<br>
-        <!--input type='text' class='lower_row_lang' v-model='ref_lang_field'-->
-        
-        <span id='ref_lang_title'>язык программирования: </span>
-        <select v-model='ref_lang_field'>
-          <option value='' selected>не выбран</option>
-          <option value='Python'>Python</option>
-          <option value='Javascript'>Javascript</option>
-          <option value='HTML'>HTML</option>
-          <option value='CSS'>CSS</option>
-          <option value='SQL'>SQL</option>
-          <option value='PHP'>PHP</option>
-          <option value='Perl'>Perl</option>
-          <option value='Ruby'>Ruby</option>
-          <option value='Shell'>Shell</option>
-        </select>
-        
-        <input type="text" id="ref" placeholder='Ссылка на файл' v-model="ref_field_cont">
-        </label>
-        <!-- Button "add reference" -->
-        <button id='ref_add_but' class='ref_buttons' @click="addRef">Добавить ссылку</button>
-        <!-- Button "remove reference" -->
-        <button id='ref_clear_but' class='ref_buttons' @click="removeRef">Удалить ссылку</button>
-        <!-- Here will be uploaded refs list. -->
-        <ul id='refs_list'>
-          <li v-for='name in this.$store.state.refs_arr'>{{ name }}</li>
-        </ul>
+              </form>
+            </v-tab-item>
+            
+            <!-- #########################3 Text ########################## -->
+            <v-tab-item :transition='false' :reverse-transition='false'>
+              <form id='text_form'>
+                
+                <v-flex class='mt-2 mx-3'>
+                  <v-text-field label='Заголовок фрагмента'
+                                placeholder='Введите заголовок'
+                                v-model='text_field_header'
+                                box>
+                  </v-text-field>
+                </v-flex>
 
-      </span>
+                <v-flex class='mx-3'>
+                  <v-textarea label='Текст фрагмента'
+                              placeholder='Введите текст'
+                              v-model='text_field_cont'
+                              box>
+                  </v-textarea>
+                </v-flex>
 
-      <button id="btn_upload" @click="upload"><b>Схоронить</b></button>
+                <!-- Language select field -->
+                <v-flex class='mt-2 mx-3'>
+                  <v-select v-model='text_lang_field'
+                            :items='languages'
+                            label='Язык программирования'
+                            solo>
+                  </v-select>
+                </v-flex>
 
-    </form>
+
+                <!-- Button "add fragment" -->
+                <button class='ref_buttons' @click="addText">Добавить фрагмент</button>
+                <!-- Button "remove reference" -->
+                <button id='ref_clear_but' class='ref_buttons' @click="removeText">Удалить фрагмент</button>
+
+                <!-- Fragments list -->
+                <ul id='refs_list'>
+                  <li v-for='title in this.$store.state.text_headers_arr'>{{ title }}</li>
+                </ul>
+
+              </form>
+            </v-tab-item>
+            
+            <!-- ######################### Files ########################## -->
+            <v-tab-item :transition='false' :reverse-transition='false'>
+              <form id='files_form'>
+                <div id="file_header">
+                  <h3>Выберите текстовый файл для загрузки.</h3>
+                  <p>Перед загрузкой файла укажите язык программирования.</p>
+                </div>
+                
+                <!-- Language select field -->
+                <v-flex class='mt-2 mx-3'>
+                  <v-select v-model='file_lang_field'
+                            :items='languages'
+                            label='Язык программирования'
+                            solo>
+                  </v-select>
+                </v-flex>
+
+
+
+
+                <!-- Field for snippet input as files, uploaded from user's browser. -->
+                <span id="file_field_span" class='lower_row'>
+                  
+                  <!-- button "Add file" -->
+                  <div id='add_file_div' class='file_buttons'>
+                    <label>
+                      <input type="file" id="file_input" v-on:change="handleFile($event)">
+                      <span id='filename_span'>Добавить файл</span>
+                    </label>
+                  </div>
+                  <!-- Button "Remove file" -->
+                  <button id='file_clear_but' class='file_buttons' @click="removeFile()">Удалить файл</button>
+                  <!-- Here will be uploaded files list. -->
+                  <ul id='files_list'>
+                    <li v-for='name in this.$store.state.files_arr'>{{ name }}</li>
+                  </ul>
+                </span>
+
+              </form>
+            </v-tab-item>
+            
+            <!-- ###################### references ######################### -->
+            <v-tab-item :transition='false' :reverse-transition='false'>
+              <form id='references_form'>
+
+                <div id="ref_header">
+                  <h3>Введите ссылку на текстовый файл.</h3>
+                </div>
+
+                <v-flex class='mt-2 mx-3'>
+                  <v-text-field label='Ссылка'
+                                placeholder='Введите ссылку'
+                                v-model='ref_field_cont'
+                                box>
+                  </v-text-field>
+                </v-flex>
+
+                <!-- Language select field -->
+                <v-flex class='mt-2 mx-3'>
+                  <v-select v-model='ref_lang_field'
+                            :items='languages'
+                            label='Язык программирования'
+                            solo>
+                  </v-select>
+                </v-flex>
+
+                
+                  <!-- Button "add reference" -->
+                  <button id='ref_add_but' class='ref_buttons' @click="addRef">Добавить ссылку</button>
+                  <!-- Button "remove reference" -->
+                  <button id='ref_clear_but' class='ref_buttons' @click="removeRef">Удалить ссылку</button>
+                  <!-- Here will be uploaded refs list. -->
+                  <ul id='refs_list'>
+                    <li v-for='name in this.$store.state.refs_arr'>{{ name }}</li>
+                  </ul>
+                </span>
+
+              </form>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-tabs>
+
+        <button id="btn_upload" @click="upload"><b>Схоронить</b></button>
+
+      </v-card>
+    </div>
+
+
   </div>
 </template>
 
@@ -159,11 +235,26 @@ export default {
   name: 'upload',
   data() {
     return {
-      // All variables in store.
+      /* vvv FOR TABS vvv */
+      languages: ['Python', 'PHP', 'Ruby', 'Perl', 'Javascript',
+                  'HTML', 'CSS', 'SQL', 'Shell',],
+      current_tab: 0,
+
+
+      /* ^^^ FOR TABS ^^^ */
     }
   },
 
   computed: {
+    
+    /* vvv FOR TABS vvv */
+
+
+
+
+    /* ^^^ FOR TABS ^^^ */
+
+
     // Form headers
     snippet_name: {
       get() {return this.$store.state.snippet_name; },
@@ -211,6 +302,14 @@ export default {
 /******************************************************************************************/
 
   methods: {
+
+    /* vvv FOR TABS vv */
+
+
+
+
+    /* ^^^ FOR TABS ^^^ */
+
 
     addText() {
       let cond1 = Boolean(this.text_field_header);
@@ -354,7 +453,6 @@ export default {
             let by = error.response.data.message.indexOf("\n", from);
             let message_object = {
               'text': error.response.data.message.substring(from+8, by),
-              //'text': error,
               'type': 'error',
             }
             this.$store.commit('AddNote', message_object);
@@ -381,78 +479,140 @@ export default {
 // Declaring variables
 @light-gray: #D6D6d6;      // for borders
 @main-color: #3581de;
+@back-gray: #fafafa;
+@blue-background: #e3f2fd;
+@text-gray: #6b6b6b;
 
 // Declaring mixins.
 .border-style(@radius, @col) {
   border: 1px solid @col;
   border-radius: @radius;
 }
+.buttons-big-shadow() {
+  box-shadow: 0 10px 15px 0 #ababab,
+               -5px 10px 15px 0 #f2f2f2,
+                5px 10px 15px 0 #f2f2f2;
+}
+.buttons-small-shadow() {
+  box-shadow: 0 3px 4px 0px #ababab,
+               -3px 3px 4px 0px #f2f2f2,
+                3px 3px 5px 0 #f2f2f2;
+}
 
-form {
-  // Form border
-  .border-style(3px, @main-color);
-  position: relative;
-  width: 90%;
-  margin: 20px auto;
-  padding-top: 10px;
+/* vvv FOR TABS vvv */
 
-  // For all input fields in form.
-  input,
-  textarea,
-  select {
-    font: 14px sans-serif;
-    color: black;
-    text-align: left;
-    margin-top: 1em;
-    background: white;
-    .border-style(5px, @light-gray);
-  }
-  select {
-    appearance: none;
-    //width: 43%;
-  }
 
-  // For "upload" button.
+#tabs_container {
+  height: 700px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+// For buttons.
+  // Upload button
   #btn_upload {
     height: 40px;
     width: 200px;
-    margin: 20px auto;
+    margin: 3px auto;
     font-size: 16px;
-    .border-style(10px, @main-color);
+    .border-style(3px, @main-color);
     background: @main-color;
     color: white;
+    .buttons-big-shadow();
     &:hover {
       background: white;
       color: @main-color;
     }
-  }
-  // For inputs in 'name' and 'description' fields.
-  .name_and_description {
-    margin-bottom: 10px;
-    width: 85%;
-    min-width: 160px;
-  }
-  // For divs 'name', 'description', 'privacy_selector'.
-  #name,
-  #description,
-  #privacy_selector {
-    display: inline-block;
-    vertical-align: top;
-    width: 46%;
-  }
-  #description_textarea {
-    height: 100px;
-  }
-  #privacy_selector {
-    position: absolute;
-    top: 80px;
-    left: 4%;
-
-    #left_span {
-      padding-right: 10%;
+    &:active {
+      background: white;
+      color: @main-color;
+      .buttons-small-shadow();
     }
   }
+.file_buttons,
+.ref_buttons {
+  display: inline-block;
+  position: relative;
+  width: 40%;
+  height: 40px;
+  min-width:100px;
+  margin: 10px 3%;
+  .border-style(3px, @main-color);
+  background: @main-color;
+  font: 14px sans-serif;
+  color: white;
+  .buttons-big-shadow();
+  &:hover {
+    color: @main-color;
+    background: white;
+  }
+  &:active {
+      background: white;
+      color: @main-color;
+      .buttons-small-shadow();
+    }
 }
+
+
+
+// Description
+#form_description {
+  max-width: 700px;
+  margin: 20px auto;
+  h2 {
+    margin: 0 auto;
+  }
+  #description_text {
+    width: 100%;
+    padding: 8px;
+  }
+  .description_paragraph {
+    margin-bottom: 10px;
+  }
+  .radio_item {
+    //width: 500px;
+    margin: 0 auto;
+  }
+
+}
+#public_description {
+  font-size: 15px;
+  color: @text-gray;
+  text-align: left;
+}
+
+// file and reference texts
+#file_header,
+#ref_header {
+  color: @text-gray;
+  text-align: left;
+  margin: 0 20px;
+  p {
+    font-size: 15px;
+  }
+  h3 {
+    font-size: 20px;
+    margin-bottom: 20px
+  }
+}
+
+form {
+  .border-style(3px, @blue-background);
+  background: @blue-background;
+        // shift X,  shift Y, blur radius, stretch
+  box-shadow: 0 2px 2px 0px #ababab,
+             -2px 2px 2px 0px #f2f2f2,
+              2px 2px 3px 0 #f2f2f2;
+  //position: relative;
+  width: 95%;
+  height: 420px;
+  margin: 20px auto 16px;
+  padding-top: 10px;
+}
+
+
+  /* ^^^ FOR TABS ^^^ */
+
 
 // For row with file upload and reference input
 .lower_row {
@@ -471,9 +631,7 @@ form {
     text-align: left;
     padding-left: 10%;
   }
-  #file_header {
-    margin-top: 10px;
-  }
+  
   #file_lang_title {
     padding-right: 6%;
   }
@@ -484,26 +642,7 @@ form {
 #file_input {
   display: none;
 }
-.file_buttons,
-.ref_buttons {
-  display: inline-block;
-  position: relative;
-  width: 40%;
-  min-width:100px;
-  margin: 10px 15px 0;
-  .border-style(10px, @main-color);
-  background: @main-color;
-  font: 14px sans-serif;
-  color: white;
-  &:hover {
-    color: @main-color;
-    background: white;
-  }
-}
-#file_clear_but,
-.ref_buttons {
-  height: 40px;
-}
+
 #add_file_div {
   height: 38px;
   label{

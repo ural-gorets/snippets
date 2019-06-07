@@ -237,6 +237,9 @@ name: 'snippets_list',
   .card_preview {
     text-align: left;
     padding: 10px;
+    code {
+      padding-top: 10px;
+    }
   }
   .snippet_ref {
     text-decoration: none;
