@@ -10,7 +10,7 @@
             v-for='(lang, index) in allowed_languages' v-bind:key='index'>
         <div><h3>{{ index+1}}.{{ lang }}</h3>
              <p>Фрагментов: {{ langs_stats[lang].amount }}</p>
-             <p>Доля: {{ langs_stats[lang].percent }}%</p>
+             <p>Доля: {{ Math.round(langs_stats[lang].percent) }}%</p>
         </div>
       </code>
 
@@ -238,7 +238,7 @@ name: 'snippets_list',
     text-align: left;
     padding: 10px;
     code {
-      padding-top: 10px;
+      padding: 10px;
     }
   }
   .snippet_ref {

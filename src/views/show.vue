@@ -213,5 +213,8 @@ name: 'snippet',
     vertical-align: middle;
   }
 }
-
+.fragment_code {
+  text-align: left;
+  background: @blue-background;
+}
 </style>

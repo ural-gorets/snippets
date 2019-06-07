@@ -20,7 +20,7 @@ import sql from 'highlight.js/lib/languages/sql';
 import php from 'highlight.js/lib/languages/php';
 
 // Import Highlight.js styles
-import 'highlight.js/styles/color-brewer.css'; // docco.css
+import 'highlight.js/styles/docco.css'; // docco.css color-brewer.css
 
 
 // The global components registration. So it is not needed to 
