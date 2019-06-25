@@ -29,6 +29,8 @@ export default new Vuex.Store({
     ref_field_cont: '',
     refs_arr: [],
     refs_obj: {},
+    // Upload button
+    upload_btn_disabled: 0,
 
     // Snippets list
     actual_page: 1,
@@ -124,6 +126,10 @@ export default new Vuex.Store({
     },
     ResetRefsObj(state) {
       state.refs_obj = {};
+    },
+    // Upload button.
+    SwitchUploadBtn(state, value) {
+      state.upload_btn_disabled = value;
     },
 
     //Notification system  

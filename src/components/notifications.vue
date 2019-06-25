@@ -32,7 +32,7 @@ export default {
 
 <style lang='less'>
   // Declaring color variables.
-  @red-note: #b3d4fc;       // for error messages   f75454
+  @red-note: #f75454;       // for error messages   f75454
   @yellow-note: #fb8c00;    // for alert messages   fcf588
   @blue-note: #2196f3;      // for info messages    a0e9f2
   @green-note: #4caf50;     // for ok messages  82ed84

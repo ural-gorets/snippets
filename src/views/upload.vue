@@ -226,7 +226,9 @@
           </ul>
         </div>
 
-        <button type='button' id="btn_upload" @click="upload"><b>Схоронить</b></button>
+        <button type='button' id="btn_upload" @click="upload" :disabled="upload_btn_disabled == 1">
+          <b>Схоронить</b>
+        </button>
 
       </v-card>
     </div>
@@ -294,6 +296,10 @@ export default {
     ref_field_cont: {
       get() {return this.$store.state.ref_field_cont; },
       set(value) {this.$store.commit('SetRefFieldCont', value); },
+    },
+    // Upload button state
+    upload_btn_disabled: {
+      get() {return this.$store.state.upload_btn_disabled; },
     },
   },
 
@@ -369,6 +375,9 @@ export default {
 
     upload() {
       /* Handle data from form and then upload it to the server. */
+      //Disable button for a while.
+      //document.getElementById("btn_upload").disabled = true;
+      this.$store.commit('SwitchUploadBtn', 1);
       // checks data presence
       const cond1 = this.$store.state.files_arr.length != 0;
       const cond2 = this.$store.state.refs_arr.length != 0;
@@ -418,10 +427,12 @@ export default {
             let data_object = JSON.parse(response.data);
             // type of note-message: ok, info, alert, error
             let msg_type;
+            console.log('Status: ', response.status);
             if (response.status == 201) {
               msg_type = 'ok'
             }
             else if (response.status == 500) {
+              console.log('Message type is Error');
               msg_type = 'error'
             }
             else if (response.status == 406) {
@@ -433,6 +444,7 @@ export default {
               'type': msg_type,
             }
             this.$store.commit('AddNote', message_object);
+            this.$store.commit('SwitchUploadBtn', 0);
             // redirect to the snippets page if cuccess.
             if (response.status == 201) {
               this.$router.push(`/show/${data_object.reference}`);
@@ -441,12 +453,14 @@ export default {
           .catch((error) => {
             let from = error.response.data.message.indexOf("DETAIL:");
             let by = error.response.data.message.indexOf("\n", from);
+            
+            let text = from != -1?error.response.data.message.substring(from+8, by):error.response.data.message;
             let message_object = {
-              'text': error.response.data.message.substring(from+8, by),
+              'text': text, 
               'type': 'error',
             }
             this.$store.commit('AddNote', message_object);
-            //console.log('Something goes wrong:', error.response.data.message); 
+            this.$store.commit('SwitchUploadBtn', 0);
           });
       } 
       else {
@@ -456,6 +470,7 @@ export default {
           'type': 'alert',
         }
         this.$store.commit('AddNote', message_object);
+        this.$store.commit('SwitchUploadBtn', 0);
       }
     },
   },
@@ -519,7 +534,7 @@ export default {
     .buttons-small-shadow();
   }
 }*/
-// for rest of buttons
+// for buttons
 .file_buttons,
 .ref_buttons,
 .file_remove,
@@ -543,6 +558,12 @@ export default {
       background: white;
       color: @main-color;
       .buttons-small-shadow();
+  }
+  &:disabled {
+    background: @blue-background;
+    color: @main-color;
+    .buttons-big-shadow;
+    .border-style(3px, @main-color);
   }
 }
 .file_remove {
